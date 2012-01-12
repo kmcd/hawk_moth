@@ -1,0 +1,2 @@
+class HawkMoth::Backtest
+end
