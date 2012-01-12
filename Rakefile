@@ -28,14 +28,14 @@ Jeweler::RubygemsDotOrgTasks.new
 require 'rake/testtask'
 Rake::TestTask.new(:test) do |test|
   test.libs << 'lib' << 'test'
-  test.pattern = 'test/**/test_*.rb'
+  test.pattern = 'test/**/*_test.rb'
   test.verbose = true
 end
 
 require 'rcov/rcovtask'
 Rcov::RcovTask.new do |test|
   test.libs << 'test'
-  test.pattern = 'test/**/test_*.rb'
+  test.pattern = 'test/**/*_test.rb'
   test.verbose = true
   test.rcov_opts << '--exclude "gems/*"'
 end
@@ -74,17 +74,16 @@ end
     file_name  = args[:name].downcase
     
     write_to "lib/#{file_name}.rb", %Q{class HawkMoth::#{class_name}\nend}
+    write_to "test/#{file_name}_test.rb", %Q{require 'helper'
   
-    write_to "test/test_#{file_name}.rb", %Q{require 'helper'
-    
-  class #{class_name}Test < Test::Unit::TestCase
-    def setup
-    end
-    
-    test "should " do
-      flunk
-    end
-  end}
+class #{class_name}Test < Test::Unit::TestCase
+  def setup
+  end
+  
+  test "should " do
+    flunk
+  end
+end}
   end
   
   def write_to(local_filename,text)
