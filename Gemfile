@@ -19,4 +19,6 @@ end
 group :test do
   gem "turn"
   gem "active_support"
+  gem "autotest"
+  gem "redgreen"
 end

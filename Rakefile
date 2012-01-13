@@ -73,8 +73,9 @@ end
     class_name = args[:name].capitalize
     file_name  = args[:name].downcase
     
-    write_to "lib/#{file_name}.rb", %Q{class HawkMoth::#{class_name}\nend}
+    write_to "lib/#{file_name}.rb", %Q{class #{class_name}\nend}
     write_to "test/#{file_name}_test.rb", %Q{require 'helper'
+    `echo "require '#{name}'" >> lib/hawk_moth.rb`
   
 class #{class_name}Test < Test::Unit::TestCase
   def setup
@@ -89,3 +90,4 @@ end}
   def write_to(local_filename,text)
     File.open(local_filename, 'w') {|f| f.write(text) }
   end
+ 
