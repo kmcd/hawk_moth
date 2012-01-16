@@ -21,4 +21,5 @@ group :test do
   gem "active_support"
   gem "autotest"
   gem "redgreen"
+  gem "ruby-debug"
 end

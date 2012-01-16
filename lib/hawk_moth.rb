@@ -1,5 +1,5 @@
 module HawkMoth
 end
 
-require 'trade'
 require 'position'
+require 'backtest'

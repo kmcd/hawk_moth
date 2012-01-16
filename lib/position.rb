@@ -1,24 +1,50 @@
 class Position
   FUNDS, COMMISSION_RATE = 100_000, 0.005
   
-  def initialize(options)
-    @opening_short_price, @opening_long_price = options[:short], options[:long]
+  def initialize(ticker_1, ticker_2, options)
+    @ticker_1, @ticker_2, @options = ticker_1, ticker_2, options 
   end
   
-  def value(options={:long => @opening_long_price, :short => @opening_short_price})
-    (long(options[:long]) + short(options[:short])) - commissons
+  def long?
+    @options[:zscore] <= -@options[:threshold]
   end
   
-  def long(price=@opening_long_price)
-    opening_price = long_shares * @opening_long_price
-    current_price = long_shares * price
-    current_price - opening_price
+  def opening_time
+    DateTime.parse @options[:time]
   end
   
-  def short(price=@opening_short_price)
-    opening_price = short_shares * @opening_short_price
-    current_price = short_shares * price
-    opening_price - current_price
+  def opening_long_price
+    long? ? @ticker_1.last : @ticker_2.last 
+  end
+  
+  def opening_short_price
+    long? ? @ticker_2.last : @ticker_1.last
+  end
+  
+  def opening_long_portfolio
+    long_shares * opening_long_price
+  end
+  
+  def opening_short_portfolio
+    short_shares * opening_short_price
+  end
+  
+  # :spy => 133.565, :ivv => 133.02
+  def profit(tickers)
+    net_profit = if long?
+      long(tickers[@ticker_1.first]) + short(tickers[@ticker_2.first])
+    else
+      short(tickers[@ticker_1.first]) + long(tickers[@ticker_2.first])
+    end
+    net_profit - commissons
+  end
+  
+  def long(price)
+    (long_shares * price) - opening_long_portfolio
+  end
+  
+  def short(price)
+    opening_short_portfolio - (short_shares * price)
   end
   
   def commissons
@@ -27,14 +53,23 @@ class Position
   end
   
   def long_shares
-    (pair_fund / @opening_long_price).round
+    (pair_fund / opening_long_price).round
   end
   
   def short_shares
-    (pair_fund / @opening_short_price).round
+    (pair_fund / opening_short_price).round
   end
   
   def pair_fund
     (FUNDS * 0.99) / 2
+  end
+  
+  # "2011-07-08 11:09 11:11 long:spy short:ivv 11.03"
+  def close(args)
+    time = args.delete(:time)
+    description = [ @options[:time].to_s, time.to_s ].join ' '
+    description << " long:#{long? ? @ticker_1.first : @ticker_2.first}"
+    description << " short:#{long? ? @ticker_2.first : @ticker_1.first}"
+    description << " %0.2f" % profit(args)
   end
 end
