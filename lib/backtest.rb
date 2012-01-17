@@ -5,8 +5,8 @@ class Backtest
   def trades
     spreads.inject("") do |log, bar|
       if entry_signal? bar
-        @position =  Position.new([:spy, 133.57], [:ivv, 134.07],
-          {:zscore => zscore(bar), :threshold => ENTRY_ZSCORE, :time => bar.first})
+        @position =  Position.new bar.last[0], bar.last[1],
+          {:zscore => zscore(bar), :threshold => ENTRY_ZSCORE, :time => bar.first}
       end
       
       if exit_signal? bar
@@ -18,14 +18,19 @@ class Backtest
     end
   end
   
+  private
+  
+  # TODO: move to Bar
   def entry_signal?(bar)
     return if @position
     return unless zscore(bar)
+    return if end_of_day?(bar)
     zscore(bar) <= -ENTRY_ZSCORE || zscore(bar) >= ENTRY_ZSCORE
   end
   
   def exit_signal?(bar)
     return unless @position
+    return true if end_of_day?(bar)
     @position.profit(quotes(bar)) >= PROFIT_TARGET
   end
   
@@ -35,5 +40,9 @@ class Backtest
   
   def quotes(bar)
     Hash[ *bar.last[0,2].flatten ].merge!(:time => bar.first)
+  end
+  
+  def end_of_day?(bar)
+    bar.first.strftime("%H:%M") == "16:00"
   end
 end
