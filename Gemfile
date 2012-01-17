@@ -3,8 +3,6 @@ source "http://rubygems.org"
 # Example:
 #   gem "activesupport", ">= 2.3.5"
 
-# TODO: move to group
-
 # Add dependencies to develop your gem here.
 # Include everything needed to run rake, tests, features, etc.
 group :development do
@@ -23,3 +21,8 @@ group :test do
   gem "redgreen"
   gem "ruby-debug"
 end
+
+gem "mongo_mapper"
+gem "jruby-openssl"
+gem "bson_ext"
+gem "fastercsv"

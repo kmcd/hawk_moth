@@ -46,3 +46,6 @@ pkg
 
 # For rubinius:
 #*.rbc
+
+# Data isn't needed on production or repo. Backup 105M file elsewhere.
+data

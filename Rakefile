@@ -74,9 +74,9 @@ end
     file_name  = args[:name].downcase
     
     write_to "lib/#{file_name}.rb", %Q{class #{class_name}\nend}
+    `echo "require '#{args[:name]}'" >> lib/hawk_moth.rb`
+    
     write_to "test/#{file_name}_test.rb", %Q{require 'helper'
-    `echo "require '#{name}'" >> lib/hawk_moth.rb`
-  
 class #{class_name}Test < Test::Unit::TestCase
   def setup
   end
@@ -91,3 +91,7 @@ end}
     File.open(local_filename, 'w') {|f| f.write(text) }
   end
  
+desc "Hawk Moth irb session"
+task :console do
+  sh "jirb -rubygems -I lib -r hawk_moth.rb"
+end

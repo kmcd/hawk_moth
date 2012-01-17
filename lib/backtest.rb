@@ -3,6 +3,8 @@ class Backtest
   attr_accessor :spreads
   
   def trades
+    return unless spreads
+    
     spreads.inject("") do |log, bars|
       bar = top_signal_from bars
       
