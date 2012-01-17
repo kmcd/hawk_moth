@@ -66,10 +66,14 @@ class Position
   
   # "2011-07-08 11:09 11:11 long:spy short:ivv 11.03"
   def close(args)
-    time = args.delete(:time)
-    description = [ @options[:time].to_s, time.to_s ].join ' '
+    description = to_date @options[:time], "%Y-%m-%d %H:%M:%S"
+    description << to_date(args.delete(:time), " %H:%M:%S")
     description << " long:#{long? ? @ticker_1.first : @ticker_2.first}"
     description << " short:#{long? ? @ticker_2.first : @ticker_1.first}"
     description << " %0.2f" % profit(args)
+  end
+  
+  def to_date(object,format)
+    DateTime.parse(object.to_s).strftime format
   end
 end
