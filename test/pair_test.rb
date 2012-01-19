@@ -58,4 +58,14 @@ class PairTest < Test::Unit::TestCase
     assert_in_delta -2.6945, @pair.cumulative_spread_zscore("2011-07-08 11:09:00"), 0.0001
     assert_in_delta 2.9627, @pair.cumulative_spread_zscore("2011-07-08 11:40:00"), 0.0001
   end
+  
+  test "should have quotes and spread for a timestamp" do
+    quote "2011-11-14 09:30:00", "SPY", 133.97
+    quote "2011-11-14 09:30:00", "IVV", 134.4036
+    assert_equal [[:spy, 133.97], [:ivv, 134.4036],  0.0], @pair.quotes_and_spread_at("2011-11-14 09:30:00")
+    
+    quote "2011-11-14 09:31:00", "SPY", 134.01	
+    quote "2011-11-14 09:31:00", "IVV", 134.46
+    assert_equal [[:spy, 134.01], [:ivv, 134.46],  -0.7071], @pair.quotes_and_spread_at("2011-11-14 09:31:00")
+  end
 end

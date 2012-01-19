@@ -21,6 +21,16 @@ class Pair
       map {|s| s.first - s.last }
   end
   
+  def quotes_and_spread_at(timestamp)
+    zscore = cumulative_spread_zscore timestamp
+    quotes = market_opening?(timestamp) ? intraday_quotes_upto(timestamp) : @quotes
+    
+    quotes[-2..-1].map {|quote| [quote.ticker.downcase.to_sym, quote.close] }.
+      push zscore.round(4)
+  end
+  
+  private
+  
   def changes_for(ticker)
     ticker_quotes = @quotes.find_all {|quote| quote.ticker == ticker }
     
