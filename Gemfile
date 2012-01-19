@@ -16,13 +16,14 @@ end
 
 group :test do
   gem "turn"
-  gem "active_support"
   gem "autotest"
   gem "redgreen"
   gem "ruby-debug"
 end
 
+gem "active_support"
 gem "mongo_mapper"
 gem "jruby-openssl"
 gem "bson_ext"
 gem "fastercsv"
+gem "statsample"

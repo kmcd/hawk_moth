@@ -10,14 +10,18 @@ class Quote
   key :close, Float
   key :volume, Integer
   
-  ensure_index [[:ticker, 1], [:timestamp, 1]]
   timestamps!
   
-  scope :ticker, lambda {|symbol| where :ticker => symbol}
+  scope :tickers, lambda {|t1,t2| 
+    where '$or' => [{:ticker => t1}, {:ticker => t2}] }
   
-  scope :from, lambda {|date| 
-    where :timestamp.gte => Date.parse(date.to_s).beginning_of_day }
+  scope :from, lambda {|timestamp| 
+    where :timestamp.gte => time_parse(timestamp) }
     
-  scope :to, lambda {|date| 
-    where :timestamp.lte => Date.parse(date.to_s).end_of_day }
+  scope :to, lambda {|timestamp| 
+    where :timestamp.lte => time_parse(timestamp) }
+  
+  def self.time_parse(date_time)
+    DateTime.parse(date_time.to_s).to_time
+  end
 end
