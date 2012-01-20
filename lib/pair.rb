@@ -60,10 +60,10 @@ class Pair
   end
   
   def market_opening?(time)
-    DateTime.parse(time) == market_open(time)
+    DateTime.parse(time.to_s) == market_open(time)
   end
   
   def market_open(time)
-    DateTime.parse(time).change :hour => 9, :min => 30
+    DateTime.parse(time.to_s).change :hour => 9, :min => 30
   end
 end

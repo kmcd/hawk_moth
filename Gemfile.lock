@@ -57,6 +57,7 @@ GEM
     rdoc (3.12)
       json (~> 1.4)
     redgreen (1.2.2)
+    redis (2.2.2)
     reek (1.2.8)
       ruby2ruby (~> 1.2)
       ruby_parser (~> 2.0)
@@ -115,6 +116,7 @@ DEPENDENCIES
   rcov
   rdoc
   redgreen
+  redis
   reek (~> 1.2.8)
   roodi (~> 2.1.0)
   ruby-debug

@@ -12,4 +12,4 @@ require 'quote'
 require 'pair'
 
 # FIXME: this should be in the quote class or elsewhere
-Quote.ensure_index [[:ticker, 1], [:timestamp, 1]], :unique => true
+Quote.ensure_index [[:_id, 1], [:ticker, 1], [:timestamp, 1]], :unique => true
