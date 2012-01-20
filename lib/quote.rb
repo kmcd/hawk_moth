@@ -1,27 +1,43 @@
+require 'redis'
+
 class Quote
-  include MongoMapper::Document
-  plugin MongoMapper::Plugins::IdentityMap
+  attr_reader :time_stamp, :ticker, :close
   
-  key :ticker, String
-  key :timestamp, Time
-  key :open, Float
-  key :high, Float
-  key :low, Float
-  key :close, Float
-  key :volume, Integer
+  def initialize(json_hash)
+    quote = JSON.parse(json_hash).symbolize_keys!
+    @time_stamp, @ticker, @close = quote[:time_stamp], quote[:ticker], 
+      quote[:close].to_f
+  end
   
-  timestamps!
+  def self.create(time_stamp, ticker, close)
+    ts = DateTime.parse(time_stamp)
+    quote = { :time_stamp => ts.to_s(:db), :close => close, :ticker => ticker }.
+      to_json
+    repository.zadd ticker, ts.to_i, quote
+  end
   
-  scope :tickers, lambda {|t1,t2| 
-    where '$or' => [{:ticker => t1}, {:ticker => t2}] }
+  def self.count(ticker)
+    repository.zcard ticker
+  end
   
-  scope :from, lambda {|timestamp| 
-    where :timestamp.gte => time_parse(timestamp) }
+  # :tickers => %[ SPY IVV ], :from => date_time, :to => date_time
+  # => [ Quote.new, ... ]
+  def self.find(args)
+    from, to = args[:from], args[:to]
     
-  scope :to, lambda {|timestamp| 
-    where :timestamp.lte => time_parse(timestamp) }
+    args[:tickers].map do |ticker|
+      repository.zrangebyscore(ticker, dt(from).to_i, dt(to).to_i).
+        map {|json| Quote.new json }
+    end.flatten.sort_by &:time_stamp
+  end
   
-  def self.time_parse(date_time)
-    DateTime.parse(date_time.to_s).to_time
+  private
+  
+  def self.repository
+    Redis.current
+  end
+  
+  def self.dt(date_time)
+    DateTime.parse date_time.to_s
   end
 end

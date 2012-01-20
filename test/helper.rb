@@ -10,19 +10,19 @@ end
 require 'test/unit'
 require 'turn'
 require 'ruby-debug'
-require 'active_support/all'
 require 'active_support/testing/declarative'
 require 'fastercsv'
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 require 'hawk_moth'
-MongoMapper.database = "hawk_moth_test"
+
+Quote.repository.select "hawk_moth_test"
 
 class Test::Unit::TestCase
   extend ActiveSupport::Testing::Declarative
   
   def teardown
-    MongoMapper.database.collections.each &:remove
+    Quote.repository.flushdb
   end
   
   # Ensure each test case has a teardown method to clear the db after each test
@@ -44,12 +44,10 @@ def oh(*args)
 end
 
 def quote(time, ticker, close)
-  Quote.create :timestamp => time, :ticker => ticker, :close => close
+  Quote.create time, ticker, close
 end
 
 def load_fixtures
-  # TODO: load these more quickly; slows down test suite by ~5 secs.
-  # Could try a mongo import, or use less fixtures
   FasterCSV.foreach('./test/fixtures.csv') do |row|
     timestamp = row.first
     quote timestamp, "SPY", row[-2]

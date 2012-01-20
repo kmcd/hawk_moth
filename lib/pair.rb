@@ -48,15 +48,14 @@ class Pair
   end
   
   def intraday_quotes_upto(current_time)
-    Quote.tickers(@ticker_1, @ticker_2).
-      from(market_open(current_time)).
-      to(current_time).
-      all.
-      group_by(&:timestamp).
+    Quote.find(:tickers => [@ticker_1, @ticker_2],
+      :from => market_open(current_time),
+      :to => current_time).
+      group_by(&:time_stamp).
       delete_if {|time,bars| bars.size < 2 }.
       map(&:last).
       flatten.
-      sort_by &:timestamp
+      sort_by &:time_stamp
   end
   
   def market_opening?(time)

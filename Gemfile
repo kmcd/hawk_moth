@@ -21,10 +21,8 @@ group :test do
   gem "ruby-debug"
 end
 
+gem "activemodel"
 gem "active_support"
-gem "mongo_mapper"
-gem "jruby-openssl"
-gem "bson_ext"
 gem "fastercsv"
 gem "statsample"
 gem "redis"
