@@ -5,27 +5,27 @@ class Pair
     @ticker_1, @ticker_2 = ticker_1,ticker_2
   end
   
-  def spread_zscore(time)
-    return 0.0 if market_opening? time
-    @quotes = intraday_quotes_upto(time)
+  def spread_zscore(time_stamp)
+    return 0.0 if market_opening? time_stamp
+    @quotes = intraday_quotes_upto(time_stamp)
     dist  = spreads.to_scale
     
     (spreads.last - dist.mean) / dist.standard_deviation_sample
   end
   
-  def spreads
-    @quotes.in_groups_of(2).map {|s| s.first.close - s.last.close }.flatten
-  end
-  
-  def quotes_and_spread_at(timestamp)
-    zscore = spread_zscore timestamp
-    quotes = market_opening?(timestamp) ? intraday_quotes_upto(timestamp) : @quotes
+  def quotes_and_spread_at(time_stamp)
+    zscore = spread_zscore time_stamp
+    quotes = market_opening?(time_stamp) ? intraday_quotes_upto(time_stamp) : @quotes
     
     quotes[-2..-1].map {|quote| [quote.ticker.downcase.to_sym, quote.close] }.
       push zscore.round(4)
   end
   
   private
+  
+  def spreads
+    @quotes.in_groups_of(2).map {|s| s.first.close - s.last.close }.flatten
+  end
   
   def intraday_quotes_upto(current_time)
     Quote.find(:tickers => [@ticker_1, @ticker_2],

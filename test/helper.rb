@@ -21,6 +21,8 @@ class Test::Unit::TestCase
   extend ActiveSupport::Testing::Declarative
   
   def teardown
+    # FIXME: why isn't this pulled from setting above?
+    Quote.repository.select "hawk_moth_test"
     Quote.repository.flushdb
   end
   

@@ -6,7 +6,7 @@ spreads = Hash.new {|h,k| h[k] = [] }
 spy_ivv = pairs.first
 
 time_stamps = Quote.find(:tickers => spy_ivv,
-  :from => "2011-07-14 09:30:00", :to => "2011-07-14 12:30:00").
+  :from => "2011-11-14 09:30:00", :to => "2011-11-14 10:30:00").
     group_by(&:time_stamp).
     delete_if {|time,bars| bars.size < 2 }.
     map(&:first).sort
@@ -22,6 +22,7 @@ time_stamps.each do |time_stamp|
 end
 
 pp time_stamps.size
+pp spreads.size
 
 # backtest = Backtest.new
 # backtest.spreads = spreads
