@@ -12,13 +12,13 @@ group :development do
   gem "reek", "~> 1.2.8"
   gem "roodi", "~> 2.1.0"
   gem "rdoc"
+  # gem "ruby-prof"
 end
 
 group :test do
   gem "turn"
   gem "autotest"
   gem "redgreen"
-  gem "ruby-debug"
 end
 
 gem "activemodel"

@@ -5,24 +5,20 @@ class Pair
     @ticker_1, @ticker_2 = ticker_1,ticker_2
   end
   
-  def cumulative_spread_zscore(time)
+  def spread_zscore(time)
     return 0.0 if market_opening? time
     @quotes = intraday_quotes_upto(time)
+    dist  = spreads.to_scale
     
-    (cumulative_spreads.last - average_spread) / stdev_spread
-  end
-  
-  def cumulative_spreads
-    spreads.each_with_index.map {|spread, index| spreads[0..index].sum }
+    (spreads.last - dist.mean) / dist.standard_deviation_sample
   end
   
   def spreads
-    [ changes_for(@ticker_1), changes_for(@ticker_2) ].transpose.
-      map {|s| s.first - s.last }
+    @quotes.in_groups_of(2).map {|s| s.first.close - s.last.close }.flatten
   end
   
   def quotes_and_spread_at(timestamp)
-    zscore = cumulative_spread_zscore timestamp
+    zscore = spread_zscore timestamp
     quotes = market_opening?(timestamp) ? intraday_quotes_upto(timestamp) : @quotes
     
     quotes[-2..-1].map {|quote| [quote.ticker.downcase.to_sym, quote.close] }.
@@ -31,31 +27,15 @@ class Pair
   
   private
   
-  def changes_for(ticker)
-    ticker_quotes = @quotes.find_all {|quote| quote.ticker == ticker }
-    
-    ticker_quotes.each_with_index.map do |quote, index| 
-      index == 0 ? 0 : ticker_quotes[index].close - ticker_quotes[index-1].close
-    end
-  end
-  
-  def average_spread
-    cumulative_spreads.to_scale.mean
-  end
-  
-  def stdev_spread
-    cumulative_spreads.to_scale.standard_deviation_sample
-  end
-  
   def intraday_quotes_upto(current_time)
     Quote.find(:tickers => [@ticker_1, @ticker_2],
       :from => market_open(current_time),
       :to => current_time).
-      group_by(&:time_stamp).
-      delete_if {|time,bars| bars.size < 2 }.
-      map(&:last).
-      flatten.
-      sort_by &:time_stamp
+        group_by(&:time_stamp).
+        delete_if {|time,bars| bars.size < 2 }.
+        map(&:last).
+        flatten.
+        sort_by &:time_stamp
   end
   
   def market_opening?(time)

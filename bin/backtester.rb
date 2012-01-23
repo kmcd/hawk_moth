@@ -2,32 +2,27 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 require "hawk_moth"
 
 pairs = %w[ SPY IVV gld iau qqq xlk FAZ tza ].in_groups_of 2
-spreads = Hash.new([])
+spreads = Hash.new {|h,k| h[k] = [] }
+spy_ivv = pairs.first
 
-pairs.each do |tickers|
-  pair = Pair.new *tickers
-  
-  pp pair
-  
-  time_stamps = Quote.tickers(*tickers).
-    to(DateTime.now).
-    all.
-    group_by(&:timestamp).
+time_stamps = Quote.find(:tickers => spy_ivv,
+  :from => "2011-07-14 09:30:00", :to => "2011-07-14 12:30:00").
+    group_by(&:time_stamp).
     delete_if {|time,bars| bars.size < 2 }.
     map(&:first).sort
-  
-  pp time_stamps
-  
-  time_stamps.each do |time_stamp|
-    # "2011-07-08 11:09:00".dt => [[ [:spy, 133.57 ], [:ivv, 134.07 ],  -2.6945 ]],
-    pp pair.quotes_and_spread_at(time_stamp)
+    
+pair = Pair.new *spy_ivv
+
+time_stamps.each do |time_stamp|
+  begin
     spreads[time_stamp] << pair.quotes_and_spread_at(time_stamp)
+  rescue
+    pp pair, time_stamp
   end
-  
-  pp spreads
 end
 
-# pp spreads.
+pp time_stamps.size
+
 # backtest = Backtest.new
 # backtest.spreads = spreads
 # puts backtest.trades

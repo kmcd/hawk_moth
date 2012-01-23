@@ -9,7 +9,6 @@ rescue Bundler::BundlerError => e
 end
 require 'test/unit'
 require 'turn'
-require 'ruby-debug'
 require 'active_support/testing/declarative'
 require 'fastercsv'
 $LOAD_PATH.unshift(File.dirname(__FILE__))

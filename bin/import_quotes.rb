@@ -3,7 +3,6 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 require "hawk_moth"
 require "fastercsv"
 
-# for each csv file in ./data
 Dir["./data/*.csv"].each do |quotes|
   FasterCSV.foreach(quotes, :headers => true) do |quote|
     Quote.create :ticker => quote[0], 
