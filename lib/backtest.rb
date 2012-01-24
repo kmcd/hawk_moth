@@ -1,5 +1,5 @@
 class Backtest
-  PROFIT_TARGET, ENTRY_ZSCORE = 10.0, 2.56
+  PROFIT_TARGET, ENTRY = 10.0, 0.03
   attr_accessor :spreads
   
   def trades
@@ -10,11 +10,11 @@ class Backtest
       
       if entry_signal? bar
         @position =  Position.new bar.last[0], bar.last[1],
-          {:zscore => zscore(bar), :threshold => ENTRY_ZSCORE, :time => bar.first}
+          {:score => spread(bar), :threshold => ENTRY, :time => bar.first}
       end
       
       if exit_signal? bar
-        log << @position.close(quotes(bar))
+        log << @position.close(quotes(bar)) + "\n"
         @position = nil
       end
       
@@ -27,9 +27,9 @@ class Backtest
   # TODO: move to Bar
   def entry_signal?(bar)
     return if @position
-    return unless zscore(bar)
+    return unless spread(bar)
     return if end_of_day?(bar)
-    zscore(bar) <= -ENTRY_ZSCORE || zscore(bar) >= ENTRY_ZSCORE
+    spread(bar) <= -ENTRY || spread(bar) >= ENTRY
   end
   
   def exit_signal?(bar)
@@ -38,7 +38,8 @@ class Backtest
     @position.profit(quotes(bar)) >= PROFIT_TARGET
   end
   
-  def zscore(bar)
+  def spread(bar)
+    return 0 unless bar.last
     bar.last.last
   end
   

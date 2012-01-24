@@ -43,7 +43,7 @@ class Position
   private
   
   def long?
-    @options[:zscore] <= -@options[:threshold]
+    @options[:score] <= -@options[:threshold]
   end
   
   def opening_time

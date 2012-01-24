@@ -3,7 +3,7 @@ require 'helper'
 class PositionTest < Test::Unit::TestCase
   def setup
     @position = Position.new([:spy, 133.57], [:ivv, 134.07],
-      {:zscore => -2.6945, :threshold => 2.56, :time => "2011-07-08 11:09:00"})
+      {:score => -0.0319, :threshold => 0.03, :time => "2011-07-08 11:09:00"})
   end
   
   # @position.profit :spy => 133.57, :ivv => 134.07,
