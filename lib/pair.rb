@@ -23,6 +23,7 @@ class Pair
   private
   
   def spreads
+    # TODO: cache quotes, ie re-fetch quotes for day only on market open
     @quotes.in_groups_of(2).map {|s| s.first.close - s.last.close }.flatten
   end
   
